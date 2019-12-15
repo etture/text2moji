@@ -21,7 +21,7 @@ class Crawler:
 
         not_full = True
         while not_full:
-            csv_filenames = [f.split('.')[0] for f in os.listdir(hex_code) if f[-4:] == '.csv']
+            csv_filenames = [f.split('.')[0] for f in os.listdir('data/{}'.format(hex_code)) if f[-4:] == '.csv']
             if len(csv_filenames) > 0:
                 cur_date = datetime.strptime(min(csv_filenames), '%Y-%m-%d')
             else:
@@ -54,7 +54,7 @@ class Crawler:
                                             .replace(to_replace=r'#\S+' ,value='',regex=True) \
                                             .replace(to_replace=r'@\S+' ,value='',regex=True) \
                                             .replace(to_replace = r'([^ 1-9 ㄱ-ㅣ가-힣]+)', value = '', regex = True)
-            tweet_df.to_csv("{}/{}.csv".format(hex_code, cur_date.strftime('%Y-%m-%d')), index=False, encoding='utf-8')
+            tweet_df.to_csv("data/{}/{}.csv".format(hex_code, cur_date.strftime('%Y-%m-%d')), index=False, encoding='utf-8')
 
 
 if __name__ == '__main__':
