@@ -36,20 +36,17 @@ class Crawler:
             print("=== Date: {} -- Collecting {} tweets in Korean ===".format(cur_date.strftime('%Y-%m-%d'), self.Max_Tweet))
 
             start_time = time.time()
+            query_emoji = EmojiSequence.from_hex(hex_code).string
             tweet_criteria = got.manager \
                             .TweetCriteria() \
-                            .setQuerySearch(hex_code) \
-                            .setSince(cur_date) \
-                            .setUntil(cur_date + timedelta(days=1)) \
+                            .setQuerySearch(query_emoji) \
+                            .setSince(cur_date.strftime('%Y-%m-%d')) \
+                            .setUntil((cur_date + timedelta(days=1)).strftime('%Y-%m-%d')) \
                             .setMaxTweets(self.Max_Tweet) \
                             .setLang('ko')  
 
             tweets = got.manager.TweetManager.getTweets(tweet_criteria)
-            tweet_list = list()
-            for tweet in tweets:
-                content = tweet.text
-                tweet_list.append([content])
-                time.sleep(0.2)
+            tweet_list = [[t.text] for t in tweets]
 
             print("Time taken to collect tweets: {0:0.2f} minutes".format((time.time() - start_time)/60))
 
@@ -59,7 +56,7 @@ class Crawler:
                                             .replace(to_replace=r'@\S+' ,value='',regex=True) \
                                             .replace(to_replace = r'([^ 1-9 ㄱ-ㅣ가-힣]+)', value = '', regex = True)
             tweet_df.to_csv("Data/{}/{}.csv".format(hex_code, cur_date.strftime('%Y-%m-%d')), index=False, encoding='utf-8')
-            
+
             print("Tweets successfully saved for date {}!".format(cur_date.strftime('%Y-%m-%d')))
 
 
