@@ -16,12 +16,9 @@ class Crawler:
 
     def run(self, hex_code):
         # Driver code
-        if not os.path.exists(hex_code):
-            os.makedirs(hex_code)
-
         not_full = True
         while not_full:
-            csv_filenames = [f.split('.')[0] for f in os.listdir('data/{}'.format(hex_code)) if f[-4:] == '.csv']
+            csv_filenames = [f.split('.')[0] for f in os.listdir('Data/{}'.format(hex_code)) if f[-4:] == '.csv']
             if len(csv_filenames) > 0:
                 cur_date = datetime.strptime(min(csv_filenames), '%Y-%m-%d')
             else:
@@ -31,10 +28,14 @@ class Crawler:
                 if cur_date.strftime('%Y-%m-%d') in csv_filenames:
                     cur_date += timedelta(days=1)
                     if cur_date > self.max_date:
+                        not_full = False
                         return
                 else:
                     exists = False
 
+            print("=== Date: {} -- Collecting {} tweets in Korean ===".format(cur_date.strftime('%Y-%m-%d'), self.Max_Tweet))
+
+            start_time = time.time()
             tweet_criteria = got.manager \
                             .TweetCriteria() \
                             .setQuerySearch(hex_code) \
@@ -49,12 +50,17 @@ class Crawler:
                 content = tweet.text
                 tweet_list.append([content])
                 time.sleep(0.2)
+
+            print("Time taken to collect tweets: {0:0.2f} minutes".format((time.time() - start_time)/60))
+
             tweet_df = pd.DataFrame(tweet_list, columns=['text'])
             tweet_df['text_stripped'] = tweet_df['text'].replace(to_replace=r'pic\S+' ,value='',regex=True) \
                                             .replace(to_replace=r'#\S+' ,value='',regex=True) \
                                             .replace(to_replace=r'@\S+' ,value='',regex=True) \
                                             .replace(to_replace = r'([^ 1-9 ㄱ-ㅣ가-힣]+)', value = '', regex = True)
-            tweet_df.to_csv("data/{}/{}.csv".format(hex_code, cur_date.strftime('%Y-%m-%d')), index=False, encoding='utf-8')
+            tweet_df.to_csv("Data/{}/{}.csv".format(hex_code, cur_date.strftime('%Y-%m-%d')), index=False, encoding='utf-8')
+            
+            print("Tweets successfully saved for date {}!".format(cur_date.strftime('%Y-%m-%d')))
 
 
 if __name__ == '__main__':
