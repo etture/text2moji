@@ -36,7 +36,7 @@ class Crawler:
             print("=== Date: {} -- Collecting {} tweets in Korean ===".format(cur_date.strftime('%Y-%m-%d'), self.Max_Tweet))
 
             start_time = time.time()
-            query_emoji = EmojiSequence.from_hex(hex_code).string
+            query_emoji = EmojiSequence.from_hex(str(hex_code)).string
             tweet_criteria = got.manager \
                             .TweetCriteria() \
                             .setQuerySearch(query_emoji) \
